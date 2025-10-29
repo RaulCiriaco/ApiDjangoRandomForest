@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>RandomForest</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            background: linear-gradient(270deg, #0f2027, #203a43, #2c5364);
+            background-size: 600% 600%;
+            animation: movebg 20s ease infinite;
+        }
+
+        @keyframes movebg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            width: 45%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00d1ff;
+            text-shadow: 0 0 10px #00d1ff;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            color: #fff;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            background-color: #00d1ff;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #00a6d6;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 15px;
+            background: #fff;
+            color: #000;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        img {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+
+        #status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .success { color: #00ffae; }
+        .error { color: #ff5e5e; }
+    </style>
+</head>
+<body>
+
+    <h1>Entrenamiento con Random Forest</h1>
+
+    <div class="container">
+        <div class="card">
+            <h3>Subir Dataset</h3>
+            <form id="trainForm" enctype="multipart/form-data">
+                <label for="file">Seleccionar archivo CSV:</label>
+                <input type="file" id="file" name="file" accept=".csv" required>
+
+                <label for="n_samples">Número de muestras (máx. 631955):</label>
+                <input type="number" id="n_samples" name="n_samples" min="10" max="631955" value="100" required>
+
+                <button type="submit">Entrenar Modelo</button>
+            </form>
+
+            <div id="status"></div>
+        </div>
+
+        <div class="card" id="results" style="display:none;">
+            <h3>Resultados:</h3>
+            <p>F1 Score (sin escalar): <span id="f1_unscaled"></span></p>
+            <p>F1 Score (escalado): <span id="f1_scaled"></span></p>
+            <p>Datos usados: <span id="samples_used"></span></p>
+            <p>Variable objetivo: <span id="target_column"></span></p>
+            <p>Total de filas: <span id="total_rows"></span></p>
+
+            <h4>Vista previa del dataset</h4>
+            <div id="preview_table"></div>
+
+            <h4>Gráfica de Dispersión</h4>
+            <img id="scatter_plot" alt="Gráfica de dispersión" style="display:none;">
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("trainForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const fileInput = document.getElementById("file");
+            const nSamples = document.getElementById("n_samples").value;
+            formData.append("file", fileInput.files[0]);
+            formData.append("n_samples", nSamples);
+
+            const status = document.getElementById("status");
+            status.textContent = "Entrenando modelo... ⏳";
+            status.className = "";
+
+            try {
+                const response = await axios.post("/api/train_csv/", formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                });
+
+                const data = response.data;
+                status.textContent = "Entrenamiento completado con éxito";
+                status.className = "success";
+                document.getElementById("results").style.display = "block";
+
+                document.getElementById("f1_unscaled").textContent = data.f1_score_unscaled;
+                document.getElementById("f1_scaled").textContent = data.f1_score_scaled;
+                document.getElementById("samples_used").textContent = data.samples_used;
+                document.getElementById("target_column").textContent = data.target_column;
+                document.getElementById("total_rows").textContent = data.total_rows;
+                document.getElementById("preview_table").innerHTML = data.preview_html;
+
+                if (data.scatter_image) {
+                    const img = document.getElementById("scatter_plot");
+                    img.src = "data:image/png;base64," + data.scatter_image;
+                    img.style.display = "block";
+                }
+
+            } catch (error) {
+                status.textContent = "❌ Error: " + (error.response?.data?.error || error.message);
+                status.className = "error";
+            }
+        });
+    </script>
+
+</body>
+</html>
