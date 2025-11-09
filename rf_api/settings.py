@@ -120,7 +120,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_URL = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 TEMPLATES[0]['DIRS'] = [BASE_DIR / 'modeltrainer' / 'templates']
 

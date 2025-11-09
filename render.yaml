@@ -2,6 +2,6 @@ services:
   - type: web
     name: AppDjangoRandomForest
     env: python
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt &&  python manage.py collectstatic --noinput
     startCommand: gunicorn rf_api.wsgi
     pythonVersion: 3.12.0
