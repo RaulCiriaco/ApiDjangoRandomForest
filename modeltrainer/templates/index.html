@@ -10,7 +10,9 @@
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
+            height: 100vh;
             color: #fff;
+            overflow-x: hidden;
             background: linear-gradient(270deg, #0f2027, #203a43, #2c5364);
             background-size: 600% 600%;
             animation: movebg 20s ease infinite;
@@ -22,29 +24,27 @@
             100% { background-position: 0% 50%; }
         }
 
-        h1 {
-            text-align: center;
-            color: #00d1ff;
-            text-shadow: 0 0 10px #00d1ff;
-            padding: 20px;
-        }
-
         .container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            padding: 20px;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 40px;
+            padding: 40px;
         }
 
-        .column {
-            flex: 1 1 400px;
-            max-width: 600px;
+        .card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 25px;
+            width: 45%;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #00d1ff;
+            text-shadow: 0 0 10px #00d1ff;
         }
 
         label {
@@ -73,18 +73,8 @@
             background-color: #00a6d6;
         }
 
-        #status {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .success { color: #00ffae; }
-        .error { color: #ff5e5e; }
-
-        img {
-            width: 100%;
-            margin-top: 15px;
-            border-radius: 10px;
+        .result {
+            margin-top: 20px;
         }
 
         table {
@@ -101,12 +91,19 @@
             text-align: center;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-            }
+        img {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 10px;
         }
+
+        #status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .success { color: #00ffae; }
+        .error { color: #ff5e5e; }
     </style>
 </head>
 <body>
@@ -114,8 +111,7 @@
     <h1>Entrenamiento con Random Forest</h1>
 
     <div class="container">
-        <!-- Columna izquierda: formulario -->
-        <div class="column">
+        <div class="card">
             <h3>Subir Dataset</h3>
             <form id="trainForm" enctype="multipart/form-data">
                 <label for="file">Seleccionar archivo CSV:</label>
@@ -128,27 +124,9 @@
             </form>
 
             <div id="status"></div>
+        </div>
 
-            <div id="images" style="display:none;">
-                {% if images_exist.limite_decision %}
-                    <h4>Límite de Decisión</h4>
-                    <img id="img_limite" src="{% static 'limite_decision.png' %}" alt="Límite de decisión">
-                {% endif %}
-            
-                {% if images_exist.comparacion %}
-                    <h4>Comparación entre escalado y sin escalar</h4>
-                    <img id="img_comparacion" src="{% static 'comparacion.png' %}" alt="Comparación">
-                {% endif %}
-            
-                {% if images_exist.arbol %}
-                    <h4>Árbol de Decisión</h4>
-                    <img id="img_arbol" src="{% static 'arbol_Decision.png' %}" alt="Árbol de decisión">
-                {% endif %}
-            </div>
-            
-
-        <!-- Columna derecha: resultados -->
-        <div class="column" id="results" style="display:none;">
+        <div class="card" id="results" style="display:none;">
             <h3>Resultados:</h3>
             <p>F1 Score (sin escalar): <span id="f1_unscaled"></span></p>
             <p>F1 Score (escalado): <span id="f1_scaled"></span></p>
@@ -158,6 +136,15 @@
 
             <h4>Vista previa del dataset</h4>
             <div id="preview_table"></div>
+
+            <h4>Límite de Decisión</h4>
+            <img src="{% static 'limite_decision.jpg' %}" alt="Límite de decisión">
+
+            <h4>Comparacion entre escalado y sin escalar</h4>
+            <img src="{% static 'comparacion.jpg' %}" alt="Datos de entrenamiento">
+
+            <h4>Arbol de Decision</h4>
+            <img src="{% static 'arbol_Decision.jpg' %}" alt="Datos de entrenamiento">
         </div>
     </div>
 
@@ -184,10 +171,6 @@
                 status.textContent = "Entrenamiento completado con éxito";
                 status.className = "success";
                 document.getElementById("results").style.display = "block";
-                document.getElementById("images").style.display = "block";
-                document.getElementById("img_limite").style.display = "block";
-                document.getElementById("img_comparacion").style.display = "block";
-                document.getElementById("img_arbol").style.display = "block";
 
                 document.getElementById("f1_unscaled").textContent = data.f1_score_unscaled;
                 document.getElementById("f1_scaled").textContent = data.f1_score_scaled;
