@@ -130,16 +130,22 @@
             <div id="status"></div>
 
             <div id="images" style="display:none;">
-                <h4>Límite de Decisión</h4>
-                <img id="img_limite" src="{% static 'limite_decision.png' %}" alt="Límite de decisión">
-
-                <h4>Comparación entre escalado y sin escalar</h4>
-                <img id="img_comparacion" src="{% static 'comparacion.png' %}" alt="Comparación">
-
-                <h4>Árbol de Decisión</h4>
-                <img id="img_arbol" src="{% static 'arbol_Decision.png' %}" alt="Árbol de decisión">
+                {% if images_exist.limite_decision %}
+                    <h4>Límite de Decisión</h4>
+                    <img id="img_limite" src="{% static 'limite_decision.png' %}" alt="Límite de decisión">
+                {% endif %}
+            
+                {% if images_exist.comparacion %}
+                    <h4>Comparación entre escalado y sin escalar</h4>
+                    <img id="img_comparacion" src="{% static 'comparacion.png' %}" alt="Comparación">
+                {% endif %}
+            
+                {% if images_exist.arbol %}
+                    <h4>Árbol de Decisión</h4>
+                    <img id="img_arbol" src="{% static 'arbol_Decision.png' %}" alt="Árbol de decisión">
+                {% endif %}
             </div>
-        </div>
+            
 
         <!-- Columna derecha: resultados -->
         <div class="column" id="results" style="display:none;">

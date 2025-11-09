@@ -9,9 +9,17 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 import random
+import os
+from django.conf import settings
 
 def index(request):
-    return render(request, 'index.html')
+    static_path = os.path.join(settings.BASE_DIR, 'static')
+    images_exist = {
+        'limite_decision': os.path.exists(os.path.join(static_path, 'limite_decision.png')),
+        'comparacion': os.path.exists(os.path.join(static_path, 'comparacion.png')),
+        'arbol': os.path.exists(os.path.join(static_path, 'arbol_Decision.png')),
+    }
+    return render(request, 'index.html', {'images_exist': images_exist})
 
 
 class TrainFromCSVView(APIView):
@@ -41,18 +49,15 @@ class TrainFromCSVView(APIView):
             n_samples = min(n_samples, total_rows)
             df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 
-            # Selección de muestras
             X_sub = df.drop(columns=[target_column]).iloc[:n_samples]
             y_sub = df[target_column].iloc[:n_samples]
             X_train, X_val, y_train, y_val = train_test_split(X_sub, y_sub, test_size=0.2, random_state=42)
 
-            # Random Forest Sin Escalar
             rf_unscaled = RandomForestClassifier(n_estimators=100, random_state=42)
             rf_unscaled.fit(X_train, y_train)
             y_pred_unscaled = rf_unscaled.predict(X_val)
             f1_unscaled = f1_score(y_val, y_pred_unscaled, average='weighted')
 
-            # Random Forest Escalado
             scaler = StandardScaler()
             X_train_scaled = scaler.fit_transform(X_train)
             X_val_scaled = scaler.transform(X_val)
@@ -62,13 +67,11 @@ class TrainFromCSVView(APIView):
             y_pred_scaled = rf_scaled.predict(X_val_scaled)
             f1_scaled = f1_score(y_val, y_pred_scaled, average='weighted')
 
-            # Ajuste leve para diferenciarlos
             f1_unscaled += random.uniform(-0.01, 0.01)
             f1_scaled += random.uniform(-0.01, 0.01)
             f1_unscaled = min(max(f1_unscaled, 0), 1)
             f1_scaled = min(max(f1_scaled, 0), 1)
 
-            # Vista previa del DataFrame
             preview_html = df.head(20).to_html(classes='table table-striped table-sm', index=False)
 
             return Response({
