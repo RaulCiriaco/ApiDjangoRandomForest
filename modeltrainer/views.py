@@ -6,10 +6,14 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
+from sklearn.tree import plot_tree
 import pandas as pd
 import numpy as np
 import random
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
 from django.conf import settings
 
 def index(request):
@@ -71,6 +75,37 @@ class TrainFromCSVView(APIView):
             f1_scaled += random.uniform(-0.01, 0.01)
             f1_unscaled = min(max(f1_unscaled, 0), 1)
             f1_scaled = min(max(f1_scaled, 0), 1)
+
+            # === Generar imágenes ===
+            static_path = os.path.join(settings.BASE_DIR, 'static')
+
+            # 1. Límite de decisión (PCA)
+            X_vis = PCA(n_components=2).fit_transform(X_val_scaled)
+            plt.figure(figsize=(12, 6))
+            sns.scatterplot(x=X_vis[:, 0], y=X_vis[:, 1], hue=y_val, palette='Set2')
+            plt.title("Límite de decisión (PCA)")
+            plt.xlabel("Componente 1")
+            plt.ylabel("Componente 2")
+            plt.tight_layout()
+            plt.savefig(os.path.join(static_path, 'limite_decision.png'))
+            plt.close()
+
+            # 2. Comparación de F1 Scores
+            plt.figure(figsize=(6, 4))
+            plt.bar(['Sin Escalar', 'Escalado'], [f1_unscaled, f1_scaled], color=['#ff7f0e', '#1f77b4'])
+            plt.title("Comparación de F1 Score")
+            plt.ylim(0, 1)
+            plt.tight_layout()
+            plt.savefig(os.path.join(static_path, 'comparacion.png'))
+            plt.close()
+
+            # 3. Árbol de decisión (primer árbol del bosque sin escalar)
+            plt.figure(figsize=(12, 6))
+            plot_tree(rf_unscaled.estimators_[0], filled=True, feature_names=X_train.columns, class_names=True)
+            plt.title("Árbol de Decisión")
+            plt.tight_layout()
+            plt.savefig(os.path.join(static_path, 'arbol_Decision.png'))
+            plt.close()
 
             preview_html = df.head(20).to_html(classes='table table-striped table-sm', index=False)
 
