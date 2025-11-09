@@ -4,4 +4,4 @@ services:
     env: python
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: gunicorn rf_api.wsgi
-    pythonVersion: 3.12
+    pythonVersion: 3.12.0
