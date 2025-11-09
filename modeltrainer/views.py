@@ -15,9 +15,9 @@ from django.conf import settings
 def index(request):
     static_path = os.path.join(settings.BASE_DIR, 'static')
     images_exist = {
-        'limite_decision': os.path.exists(os.path.join(static_path, 'limite_decision.png')),
-        'comparacion': os.path.exists(os.path.join(static_path, 'comparacion.png')),
-        'arbol': os.path.exists(os.path.join(static_path, 'arbol_Decision.png')),
+        'limite_decision': os.path.exists(os.path.join(static_path, 'limite_decision.jpg')),
+        'comparacion': os.path.exists(os.path.join(static_path, 'comparacion.jpg')),
+        'arbol': os.path.exists(os.path.join(static_path, 'arbol_Decision.jpg')),
     }
     return render(request, 'index.html', {'images_exist': images_exist})
 
