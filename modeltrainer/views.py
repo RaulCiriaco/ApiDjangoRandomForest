@@ -8,6 +8,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Usar backend sin GUI
 import matplotlib.pyplot as plt
 import numpy as np
 import io, base64
