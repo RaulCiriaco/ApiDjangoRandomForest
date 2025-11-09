@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-bsz^vy%cseod^hizrx-j0%jr3qw%ty%8p)bf8adfg)4v%!x7f5"
 
-DEBUG = True
+DEBUG = False 
 
 # Render asigna automáticamente un dominio como rf-api.onrender.com
 ALLOWED_HOSTS = ['*']
