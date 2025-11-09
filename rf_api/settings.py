@@ -25,10 +25,13 @@ SECRET_KEY = "django-insecure-bsz^vy%cseod^hizrx-j0%jr3qw%ty%8p)bf8adfg)4v%!x7f5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [ ]
+ALLOWED_HOSTS = [
+    'apidjangorandomforest.onrender.com',
+    'apidjangorandomforest-production.up.railway.app',
+    'localhost',
+    '127.0.0.1'
+]
 
-
-#
 
 
 # Application definition
